@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fran — Edição de Vídeo Estratégica</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0C0C; --surface: #141414; --surface-2: #1C1C1C;
+    --border: #262626; --text: #F0EDE8; --text-muted: #A09890;
+    --text-dim: #605850; --accent: #E8967A; --accent-2: #9CB8A0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Archivo', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.35; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(12,12,12,0.95), transparent); }
+  .nav-logo { font-family: 'Archivo Black', sans-serif; font-size: 18px; color: var(--text); text-decoration: none; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 48px 80px; position: relative; overflow: hidden; }
+  .hero-line { position: absolute; top: 0; width: 1px; background: var(--border); height: 100%; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 32px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-tag::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent); }
+  .hero h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(52px, 8vw, 108px); line-height: 0.95; letter-spacing: -2px; max-width: 900px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .hero h1 em { font-style: normal; color: transparent; -webkit-text-stroke: 1px var(--accent); }
+  .hero-sub { margin-top: 40px; max-width: 460px; font-size: 16px; font-weight: 300; line-height: 1.7; color: var(--text-muted); opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  section { padding: 120px 48px; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 48px; display: flex; align-items: center; gap: 16px; }
+  .section-label::after { content: ''; flex: 1; max-width: 48px; height: 1px; background: var(--border); }
+
+  .about { border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .about-left h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 28px; }
+  .about-left h2 span { color: var(--accent); }
+  .about-left p { font-size: 15px; font-weight: 300; line-height: 1.8; color: var(--text-muted); margin-bottom: 16px; }
+  .pillar { border-top: 1px solid var(--border); padding: 24px 0; display: grid; grid-template-columns: 28px 1fr; gap: 16px; }
+  .pillar-num { font-family: 'Archivo Black', sans-serif; font-size: 11px; color: var(--text-dim); padding-top: 2px; }
+  .pillar-title { font-family: 'Archivo Black', sans-serif; font-size: 13px; margin-bottom: 6px; }
+  .pillar-desc { font-size: 13px; font-weight: 300; line-height: 1.7; color: var(--text-muted); }
+
+  .projects { border-top: 1px solid var(--border); }
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; align-items: center; }
+  .filter-divider { width: 1px; height: 28px; background: var(--border); }
+  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn { display: inline-flex; align-items: center; padding: 7px 14px; font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 500; border-radius: 2px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,150,122,0.08); }
+  .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.25s, transform 0.25s; cursor: pointer; }
+  .project-card:hover { border-color: rgba(232,150,122,0.4); transform: translateY(-2px); }
+  .project-card[data-hidden="true"] { display: none; }
+  .card-thumb { aspect-ratio: 9/16; background: var(--surface-2); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .card-thumb-bg { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(232,150,122,0.06), transparent 60%); }
+  .card-thumb-icon { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-muted); position: relative; z-index: 1; transition: all 0.2s; }
+  .project-card:hover .card-thumb-icon { border-color: var(--accent); color: var(--accent); }
+  .card-tags { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 2; }
+  .card-tag { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .card-tag.nicho { background: rgba(156,184,160,0.15); color: var(--accent-2); border: 1px solid rgba(156,184,160,0.3); }
+  .card-tag.formato { background: rgba(12,12,12,0.6); color: var(--text-muted); border: 1px solid var(--border); }
+  .card-tag.objetivo { background: rgba(232,150,122,0.12); color: var(--accent); border: 1px solid rgba(232,150,122,0.3); }
+  .card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-title { font-family: 'Archivo Black', sans-serif; font-size: 15px; line-height: 1.3; }
+  .card-desc { font-size: 12px; font-weight: 300; line-height: 1.65; color: var(--text-muted); }
+  .card-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-dim); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.25s; backdrop-filter: blur(4px); }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 860px; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: 200px 1fr; transform: translateY(16px); transition: transform 0.25s; }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-video { background: var(--surface-2); display: flex; align-items: center; justify-content: center; min-height: 300px; }
+  .modal-video iframe { width: 100%; aspect-ratio: 9/16; border: none; display: block; }
+  .modal-video-inner { aspect-ratio: 9/16; width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--text-dim); font-size: 12px; }
+  .modal-play { width: 48px; height: 48px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .modal-content { padding: 36px; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .modal-title { font-family: 'Archivo Black', sans-serif; font-size: clamp(18px, 2.5vw, 24px); letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 28px; }
+  .breakdown { display: flex; flex-direction: column; gap: 22px; }
+  .breakdown-block { border-left: 2px solid var(--border); padding-left: 18px; transition: border-color 0.2s; }
+  .breakdown-block:hover { border-color: var(--accent); }
+  .breakdown-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+  .breakdown-title { font-family: 'Archivo Black', sans-serif; font-size: 14px; margin-bottom: 6px; }
+  .breakdown-text { font-size: 13px; font-weight: 300; line-height: 1.75; color: var(--text-muted); }
+  .breakdown-text strong { color: var(--text); font-weight: 500; }
+
+  .processo { border-top: 1px solid var(--border); padding: 80px 48px; }
+  .processo-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+  .step { padding: 32px 28px; background: var(--surface); border: 1px solid var(--border); transition: border-color 0.2s; }
+  .step:hover { border-color: var(--accent); }
+  .step-num { font-family: 'Archivo Black', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .step-title { font-family: 'Archivo Black', sans-serif; font-size: 14px; line-height: 1.3; color: var(--text); margin-bottom: 8px; }
+  .step-desc { font-size: 12px; font-weight: 300; line-height: 1.65; color: var(--text-muted); }
+  .step-desc a { color: var(--accent); text-decoration: underline; }
+  .step-note { display: inline-block; margin-top: 12px; font-size: 11px; color: var(--text-dim); font-style: italic; line-height: 1.5; }
+
+  .bonus { border-top: 1px solid var(--border); padding: 120px 48px; }
+  .bonus-inner { max-width: 760px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+  .bonus-left { padding: 48px; border-right: 1px solid var(--border); }
+  .bonus-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-2); background: rgba(156,184,160,0.1); border: 1px solid rgba(156,184,160,0.3); padding: 4px 10px; border-radius: 2px; margin-bottom: 20px; }
+  .bonus-title { font-family: 'Archivo Black', sans-serif; font-size: clamp(20px, 2.5vw, 28px); line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .bonus-title span { color: var(--accent); }
+  .bonus-desc { font-size: 14px; font-weight: 300; line-height: 1.75; color: var(--text-muted); margin-bottom: 28px; }
+  .bonus-items { display: flex; flex-direction: column; gap: 10px; }
+  .bonus-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
+  .bonus-item::before { content: '✓'; color: var(--accent-2); font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .bonus-right { padding: 48px; display: flex; flex-direction: column; justify-content: center; }
+  .bonus-form-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; }
+  .bonus-input { width: 100%; padding: 12px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 2px; font-family: 'Archivo', sans-serif; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; margin-bottom: 10px; display: block; }
+  .bonus-input:focus { border-color: var(--accent-2); }
+  .bonus-input::placeholder { color: var(--text-dim); }
+  .bonus-submit { width: 100%; padding: 13px; background: var(--accent-2); color: #0C0C0C; font-family: 'Archivo', sans-serif; font-size: 13px; font-weight: 600; border: none; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
+  .bonus-submit:hover { background: #b0caaf; transform: translateY(-1px); }
+  .bonus-note { font-size: 11px; color: var(--text-dim); margin-top: 12px; line-height: 1.5; }
+  .bonus-success { display: none; text-align: center; }
+  .bonus-success .check { width: 52px; height: 52px; border-radius: 50%; background: rgba(156,184,160,0.15); border: 1px solid rgba(156,184,160,0.3); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 16px; }
+  .bonus-success p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.7; }
+  .bonus-success strong { color: var(--text); font-weight: 500; }
+
+  .contact { border-top: 1px solid var(--border); text-align: center; padding: 120px 48px; }
+  .contact h2 { font-family: 'Archivo Black', sans-serif; font-size: clamp(36px, 5vw, 64px); letter-spacing: -2px; line-height: 1; margin-bottom: 20px; }
+  .contact h2 span { color: transparent; -webkit-text-stroke: 1px var(--accent); }
+  .contact p { font-size: 15px; font-weight: 300; color: var(--text-muted); margin-bottom: 40px; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+  .contact-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; font-family: 'Archivo', sans-serif; font-size: 13px; font-weight: 500; text-decoration: none; border-radius: 2px; transition: all 0.2s; cursor: pointer; border: none; }
+  .btn-primary { background: var(--accent); color: #0C0C0C; }
+  .btn-primary:hover { background: #f0a88e; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--text-muted); transform: translateY(-1px); }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 48px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 900px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } .processo-steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    nav { padding: 20px 24px; } .nav-links { display: none; }
+    section, .hero { padding-left: 24px; padding-right: 24px; }
+    .about { grid-template-columns: 1fr; gap: 48px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .processo-steps { grid-template-columns: 1fr; }
+    .modal { grid-template-columns: 1fr; }
+    .bonus-inner { grid-template-columns: 1fr; }
+    .bonus-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 24px; }
+    .bonus-right { padding: 32px 24px; }
+    footer { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Fran<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#projetos">Projetos</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-line" style="right:120px;opacity:.4"></div>
+  <div class="hero-line" style="right:400px;opacity:.2"></div>
+  <div class="hero-tag">Edição de Vídeo Estratégica</div>
+  <h1>Vídeo que<br><em>convence</em><br>converte.</h1>
+  <p class="hero-sub">Cada corte tem uma razão —<br>para quem tem algo relevante a dizer <strong>e quer que o vídeo entregue isso</strong>.</p>
+</section>
+
+<section id="sobre" class="about">
+  <div class="about-left">
+    <h2>Edição é<br><span>estratégia,</span><br>não estética.</h2>
+    <p>Antes de abrir qualquer ferramenta, a pergunta é: o que o espectador precisa sentir para tomar uma decisão?</p>
+  </div>
+  <div class="about-right">
+    <div class="pillar">
+      <span class="pillar-num">01</span>
+      <div><div class="pillar-title">Começo pelo objetivo</div><div class="pillar-desc">Antes de abrir qualquer ferramenta, a pergunta é: o que o espectador precisa sentir para tomar uma decisão?</div></div>
+    </div>
+    <div class="pillar">
+      <span class="pillar-num">02</span>
+      <div><div class="pillar-title">Cada decisão tem razão</div><div class="pillar-desc">Cor, enquadramento, ritmo — tudo serve a um estado emocional específico, não ao gosto do momento.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="projetos" class="projects">
+  <div class="section-label">Projetos</div>
+  <div class="filters">
+    <div class="filter-group">
+      <button class="filter-btn active" data-group="nicho" data-value="all">Todos os nichos</button>
+      <button class="filter-btn" data-group="nicho" data-value="nutricao">Nutrição</button>
+      <button class="filter-btn" data-group="nicho" data-value="fitness">Fitness</button>
+      <button class="filter-btn" data-group="nicho" data-value="saude">Saúde</button>
+      <button class="filter-btn" data-group="nicho" data-value="devpessoal">Dev. Pessoal</button>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <button class="filter-btn active" data-group="formato" data-value="all">Todos os formatos</button>
+      <button class="filter-btn" data-group="formato" data-value="reels">Reels · TikTok</button>
+      <button class="filter-btn" data-group="formato" data-value="shorts">YouTube Shorts</button>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <button class="filter-btn active" data-group="objetivo" data-value="all">Todos os objetivos</button>
+      <button class="filter-btn" data-group="objetivo" data-value="atrair">Atrair</button>
+      <button class="filter-btn" data-group="objetivo" data-value="engajar">Engajar</button>
+      <button class="filter-btn" data-group="objetivo" data-value="converter">Converter</button>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- Card 1 — Dietas -->
+    <div class="project-card" data-nicho="nutricao" data-formato="reels" data-objetivo="atrair" onclick="openModal('modal-1')">
+      <div class="card-thumb"><div class="card-thumb-bg"></div><div class="card-tags"><span class="card-tag nicho">Nutrição</span><span class="card-tag formato">Reels · TikTok</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">Dietas restritivas — por que sempre falham?</div><div class="card-desc">Vídeo que transforma culpa em alívio. O espectador termina confiante — não julgado.</div><div class="card-footer">55s · Arco emocional completo</div></div>
+    </div>
+
+    <!-- Card 2 — Pedro Sobral -->
+    <div class="project-card" data-nicho="devpessoal" data-formato="shorts" data-objetivo="atrair" onclick="openModal('modal-2')">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#1a1418,#0c0c0c);"><div class="card-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">Como parar de sabotar seu próprio crescimento</div><div class="card-desc">Conteúdo que provoca identificação e gera reflexão imediata no espectador.</div><div class="card-footer">Shorts · Dev. Pessoal</div></div>
+    </div>
+
+    <!-- Card 3 — Ana Carolina -->
+    <div class="project-card" data-nicho="devpessoal" data-formato="shorts" data-objetivo="atrair" onclick="openModal('modal-3')">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#141820,#0c0c0c);"><div class="card-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">O que ninguém te conta sobre mudar de vida</div><div class="card-desc">Vídeo que valida a experiência do espectador antes de propor qualquer solução.</div><div class="card-footer">Shorts · Dev. Pessoal</div></div>
+    </div>
+
+    <!-- Card 4 — Nutricionistas -->
+    <div class="project-card" data-nicho="nutricao" data-formato="reels" data-objetivo="atrair" onclick="openModal('modal-4')">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#141a14,#0c0c0c);"><div class="card-tags"><span class="card-tag nicho">Nutrição</span><span class="card-tag formato">Reels · TikTok</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">Por que você come bem o dia todo e peca à noite</div><div class="card-desc">Conteúdo educativo que transforma culpa em curiosidade e abre espaço para solução.</div><div class="card-footer">Reels · Nutrição</div></div>
+    </div>
+
+    <!-- Card 5 — Treino Dev Pessoal -->
+    <div class="project-card" data-nicho="devpessoal" data-formato="shorts" data-objetivo="atrair" onclick="openModal('modal-5')">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#181414,#0c0c0c);"><div class="card-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">Consistência não é motivação — é sistema</div><div class="card-desc">Vídeo que quebra uma crença limitante com clareza e entrega uma ideia acionável.</div><div class="card-footer">Shorts · Dev. Pessoal</div></div>
+    </div>
+
+    <!-- Card 6 — Fitness -->
+    <div class="project-card" data-nicho="fitness" data-formato="shorts" data-objetivo="atrair" onclick="openModal('modal-6')">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#121a14,#0c0c0c);"><div class="card-tags"><span class="card-tag nicho">Fitness</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div><div class="card-thumb-icon">&#9654;</div></div>
+      <div class="card-body"><div class="card-title">O erro que impede 90% das pessoas de ver resultado</div><div class="card-desc">Conteúdo de autoridade que gera retenção pelo dado e posiciona o criador como referência.</div><div class="card-footer">Shorts · Fitness</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Modal 1 — Dietas (sem embed, vídeo ainda não publicado) -->
+<div class="modal-overlay" id="modal-1" onclick="closeModal(event,'modal-1')">
+  <div class="modal">
+    <div class="modal-video"><div class="modal-video-inner"><div class="modal-play">&#9654;</div><span>Vídeo em breve</span></div></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-1')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Nutrição</span><span class="card-tag formato">Reels · TikTok</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">Dietas restritivas — por que sempre falham?</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">Público que se culpa, não que aprende</div><div class="breakdown-text">Nutricionista que precisa alcançar mulheres cansadas de tentar e falhar. O visual padrão do nicho reforça a culpa. A mensagem central é <strong>"o problema não é você"</strong>, e o visual precisa comunicar isso antes da fala começar.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">Culpa → Alívio → Confiança</div><div class="breakdown-text">A cor começa fria e apagada — o espectador está no problema. Aquece progressivamente até o CTA. O enquadramento fecha no rosto no início e no fim, criando um arco visual de acolhimento.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">55 segundos · Arco emocional fechado</div><div class="breakdown-text">O espectador termina no mesmo lugar seguro onde entrou — agora com confiança para agir. O CTA é um convite, não uma pressão.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2 — Pedro Sobral -->
+<div class="modal-overlay" id="modal-2" onclick="closeModal(event,'modal-2')">
+  <div class="modal">
+    <div class="modal-video">
+      <iframe src="https://www.youtube.com/embed/PDtewtQUg18?rel=0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-2')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">Como parar de sabotar seu próprio crescimento</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o objetivo do projeto e o público.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Explique a lógica por trás das decisões visuais.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o estado emocional final do espectador.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3 — Ana Carolina -->
+<div class="modal-overlay" id="modal-3" onclick="closeModal(event,'modal-3')">
+  <div class="modal">
+    <div class="modal-video">
+      <iframe src="https://www.youtube.com/embed/OOQVB8u6nqU?rel=0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-3')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">O que ninguém te conta sobre mudar de vida</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o objetivo do projeto e o público.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Explique a lógica por trás das decisões visuais.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o estado emocional final do espectador.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 4 — Nutricionistas -->
+<div class="modal-overlay" id="modal-4" onclick="closeModal(event,'modal-4')">
+  <div class="modal">
+    <div class="modal-video">
+      <iframe src="https://www.youtube.com/embed/Df3G3qWl0sw?rel=0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-4')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Nutrição</span><span class="card-tag formato">Reels · TikTok</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">Por que você come bem o dia todo e peca à noite</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o objetivo do projeto e o público.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Explique a lógica por trás das decisões visuais.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o estado emocional final do espectador.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 5 — Treino Dev Pessoal -->
+<div class="modal-overlay" id="modal-5" onclick="closeModal(event,'modal-5')">
+  <div class="modal">
+    <div class="modal-video">
+      <iframe src="https://www.youtube.com/embed/C2uH4w4X4Ng?rel=0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-5')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Dev. Pessoal</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">Consistência não é motivação — é sistema</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o objetivo do projeto e o público.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Explique a lógica por trás das decisões visuais.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o estado emocional final do espectador.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 6 — Fitness -->
+<div class="modal-overlay" id="modal-6" onclick="closeModal(event,'modal-6')">
+  <div class="modal">
+    <div class="modal-video">
+      <iframe src="https://www.youtube.com/embed/X-RNCXGfFC0?rel=0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModalDirect('modal-6')">&#x2715;</button>
+      <div class="modal-tags"><span class="card-tag nicho">Fitness</span><span class="card-tag formato">YouTube Shorts</span><span class="card-tag objetivo">Atrair</span></div>
+      <div class="modal-title">O erro que impede 90% das pessoas de ver resultado</div>
+      <div class="breakdown">
+        <div class="breakdown-block"><div class="breakdown-label">Contexto</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o objetivo do projeto e o público.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Decisão estratégica</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Explique a lógica por trás das decisões visuais.</div></div>
+        <div class="breakdown-block"><div class="breakdown-label">Resultado</div><div class="breakdown-title">A preencher</div><div class="breakdown-text">Descreva o estado emocional final do espectador.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="processo">
+  <div class="section-label">Como funciona?</div>
+  <div class="processo-steps">
+    <div class="step"><div class="step-num">01</div><div class="step-title">Conversa inicial</div><div class="step-desc">Você me conta sobre o objetivo do vídeo, o estilo que gosta e o prazo que precisa. Se precisar de ajuda com a gravação, <a href="#bonus">fiz esse guia especialmente pra você</a>.</div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-title">Envio do material</div><div class="step-desc">Você compartilha as gravações, referências e qualquer material relevante. Eu confirmo o recebimento e te digo o prazo de entrega — varia por volume e complexidade.</div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-title">Revisão</div><div class="step-desc">Você assiste e me diz se quer ajustar algo. Inclui uma rodada de revisão. A partir da segunda, tem custo adicional.</div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-title">Entrega final</div><div class="step-desc">Arquivo pronto no formato e no prazo combinado.</div><span class="step-note">Comunicação por WhatsApp ou e-mail — retorno em até 24h em dias úteis</span></div>
+  </div>
+</section>
+
+<section id="bonus" class="bonus">
+  <div class="section-label">Bônus</div>
+  <div class="bonus-inner">
+    <div class="bonus-left">
+      <span class="bonus-tag">Gratuito</span>
+      <h2 class="bonus-title">Como Gravar Vídeos que <span>Atraem Clientes</span></h2>
+      <p class="bonus-desc">Para quem quer aparecer melhor na câmera — sem precisar de equipamento caro.</p>
+      <div class="bonus-items">
+        <div class="bonus-item">Formato certo antes de qualquer coisa</div>
+        <div class="bonus-item">Como usar a luz a seu favor</div>
+        <div class="bonus-item">Enquadramento que transmite confiança</div>
+        <div class="bonus-item">Como falar na câmera de forma natural</div>
+        <div class="bonus-item">Checklist antes de gravar</div>
+      </div>
+    </div>
+    <div class="bonus-right">
+      <div id="bonus-form-area">
+        <div class="bonus-form-label">Receber o guia grátis</div>
+        <form id="bonus-form" action="https://formspree.io/f/xyknpzev" method="POST">
+          <input class="bonus-input" type="text" name="name" placeholder="Seu nome" required />
+          <input class="bonus-input" type="email" name="email" placeholder="Seu melhor e-mail" required />
+          <input type="hidden" name="_subject" value="Novo lead — Guia de Gravação" />
+          <button type="submit" class="bonus-submit">Quero o guia &#8594;</button>
+        </form>
+        <p class="bonus-note">Sem spam. Você recebe o PDF por e-mail em breve.</p>
+      </div>
+      <div class="bonus-success" id="bonus-success">
+        <div class="check">&#10003;</div>
+        <p><strong>Guia a caminho!</strong><br>Vou enviar o PDF para o seu e-mail em breve.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contato" class="contact">
+  <h2>Vamos <span>criar</span><br>juntos?</h2>
+  <p>Se você tem um projeto, eu tenho interesse em ouvir.</p>
+  <div class="contact-links">
+    <a href="mailto:seuemail@email.com" class="btn btn-primary">E-mail</a>
+    <a href="https://wa.me/55SEUNUMERO" target="_blank" class="btn btn-ghost">WhatsApp</a>
+    <a href="https://instagram.com/seuarroba" target="_blank" class="btn btn-ghost">Instagram</a>
+  </div>
+</section>
+
+<footer>
+  <span>&#169; 2025 Fran — Edição de Vídeo Estratégica</span>
+  <span>Feito com intenção.</span>
+</footer>
+
+<script>
+  var activeFilters = { nicho: 'all', formato: 'all', objetivo: 'all' };
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var group = btn.dataset.group;
+      document.querySelectorAll('[data-group="' + group + '"]').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      activeFilters[group] = btn.dataset.value;
+      applyFilters();
+    });
+  });
+  function applyFilters() {
+    document.querySelectorAll('.project-card').forEach(function(card) {
+      var ok = (activeFilters.nicho === 'all' || card.dataset.nicho === activeFilters.nicho) &&
+               (activeFilters.formato === 'all' || card.dataset.formato === activeFilters.formato) &&
+               (activeFilters.objetivo === 'all' || card.dataset.objetivo === activeFilters.objetivo);
+      card.setAttribute('data-hidden', !ok);
+    });
+  }
+  function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModalDirect(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+  function closeModal(event, id) { if (event.target === event.currentTarget) closeModalDirect(id); }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.open').forEach(function(m) { m.classList.remove('open'); document.body.style.overflow = ''; });
+    }
+  });
+  var bonusForm = document.getElementById('bonus-form');
+  bonusForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var data = new FormData(bonusForm);
+    fetch(bonusForm.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+      .then(function(res) {
+        if (res.ok) {
+          document.getElementById('bonus-form-area').style.display = 'none';
+          document.getElementById('bonus-success').style.display = 'block';
+        } else {
+          alert('Algo deu errado. Tente novamente.');
+        }
+      })
+      .catch(function() { alert('Algo deu errado. Tente novamente.'); });
+  });
+</script>
+</body>
+</html>
